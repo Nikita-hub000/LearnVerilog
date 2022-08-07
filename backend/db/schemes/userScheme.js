@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 mongoose.Promise = require("bluebird");
 
 const User = new Schema({
+  username: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
@@ -10,10 +14,6 @@ const User = new Schema({
   password: {
     type: String,
     required: true,
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false,
   },
 });
 
