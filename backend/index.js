@@ -28,13 +28,14 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 
-const createEmptyAccount = () => {
-  const account = new User({
-    email: "testEmail",
-    password: "abc",
-  });
-  account.save().then((result) => {
-    console.log(result);
-  });
-};
-createEmptyAccount();
+// const createEmptyAccount = () => {
+//   const account = new User({
+//     email: "testEmail",
+//     password: "abc",
+//   });
+//   account.save().then((result) => {
+//     console.log(result);
+//   });
+// };
+// createEmptyAccount();
+
