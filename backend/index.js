@@ -4,11 +4,6 @@ const bodyParser = require("body-parser");
 
 const app = express();
 const user = require("./routes/user-route");
-// const reg = require('./router/router')
-// const sud = require('./router/sud')
-// const chat = require('./router/chat')
-// const players = require('./router/players')
-// const friend = require('./router/friend')
 const corsMiddleware = require("./middleware/cors.middleware");
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
@@ -22,7 +17,7 @@ app.get("/", (req, res) => {
   res.send("Hello, user!");
 });
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
