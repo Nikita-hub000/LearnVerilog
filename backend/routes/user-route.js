@@ -30,14 +30,14 @@ router.post("/registration", async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    res.status(201).json({
+    return res.status(201).json({
       message: "Account successfully created",
       tokens: tokens,
       data: { username: user.username, email: user.email, id: user._id },
     });
   } catch (error) {
     console.log(err);
-    res.status(500).json({
+    return res.status(500).json({
       error: err,
     });
   }
@@ -63,7 +63,7 @@ router.post("/login", async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    res.status(200).json({
+    return res.status(200).json({
       message: "Auth completed",
       tokens: tokens,
       data: { username: user.username, email: user.email, id: user._id },
@@ -80,11 +80,12 @@ router.post("/logout", async (req, res) => {
     const { refreshToken } = req.cookies;
     await TokenService.removeToken(refreshToken);
     res.clearCookie("refreshToken");
-    res.status(200).json({
+    return res.status(200).json({
       message: "Successfully logged out",
     });
   } catch (error) {
-    res.status(500).json({
+    console.log(error);
+    return res.status(500).json({
       error: error,
     });
   }
@@ -92,15 +93,17 @@ router.post("/logout", async (req, res) => {
 router.get("/refresh", async (req, res) => {
   const { refreshToken } = req.cookies;
   if (!refreshToken) {
-    res.status(401).json({
+    return res.status(401).json({
       message: "You are not authorized",
+      message2: "PROBLEM WITH REFRESH TOKEN",
     });
   }
   const userData = TokenService.validateRefreshToken(refreshToken);
   const tokenDb = await TokenService.findToken(refreshToken);
   if (!userData || !tokenDb) {
-    res.status(401).json({
+    return res.status(401).json({
       message: "You are not authorized",
+      message2: "PROBLEM WITH USERDATA OR TOKENDB",
     });
   }
   const user = await User.findById(userData.id);
@@ -112,14 +115,14 @@ router.get("/refresh", async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    res.status(200).json({
-      message: "Auth completed",
+    return res.status(200).json({
+      message: "Refresh completed",
       tokens: tokens,
       data: { username: user.username, email: user.email, id: user._id },
     });
   } catch (error) {
     console.log(err);
-    res.status(500).json({
+    return res.status(500).json({
       error: err,
     });
   }
@@ -129,13 +132,13 @@ router.get("/details", authMiddleware, async (req, res) => {
     try {
       console.log(req.user);
       const user = await User.findOne({ _id: req.user.id });
-      res.status(200).json({
+      return res.status(200).json({
         message: "Successful Response",
         data: { username: user.username, id: user._id, email: user.email },
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         error: "User is not found",
       });
     }
@@ -145,13 +148,13 @@ router.get("/all", authMiddleware, async (req, res) => {
   if (req.user) {
     try {
       const users = await User.find();
-      res.status(200).json({
+      return res.status(200).json({
         message: "Successful Response",
         data: { users },
       });
     } catch (error) {
       console.log(error);
-      res.status(500).json({
+      return res.status(500).json({
         error: "User is not found",
       });
     }
