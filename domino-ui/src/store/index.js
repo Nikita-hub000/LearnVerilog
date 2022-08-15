@@ -3,17 +3,17 @@ import { createStore } from "vuex";
 const store = createStore({
   state() {
     return {
-      name: '',
-      email: '',
+      name: "",
+      email: "",
     };
   },
   getters: {},
   mutations: {
-    setInfo(state, login, gmail){
-        state.name = login
-        state.email = gmail
+    setInfo(state, payload) {
+      state.name = payload.login;
+      state.email = payload.email;
     },
   },
 });
 
-export default store
+export default store;
