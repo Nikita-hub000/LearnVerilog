@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div id="nav" v-show="!isLoginPage">
+    <div id="nav" v-if="!isLoginPage">
       <router-link class="link" to="/">Home</router-link> |
       <router-link class="link" to="/">Home</router-link>
       <!-- <router-link

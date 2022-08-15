@@ -5,11 +5,13 @@ const store = createStore({
     return {
       name: "",
       email: "",
+      accessToken: "",
     };
   },
   getters: {},
   mutations: {
     setInfo(state, payload) {
+      state.accessToken = payload.accessToken;
       state.name = payload.login;
       state.email = payload.email;
     },

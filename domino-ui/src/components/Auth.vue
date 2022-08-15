@@ -2,36 +2,17 @@
   <w-form v-model="valid" class="form">
     <h1>DOMINO</h1>
     <p>{{ isRegistration ? "Регистрация" : "Вход" }}</p>
-    <w-input
-      class="mt3 form__input"
-      v-model="form.name"
-      v-show="isRegistration"
-      label="Имя"
-      :validators="[validators.required]"
-    >
+    <w-input class="mt3 form__input" v-model="form.name" v-show="isRegistration" label="Имя"
+      :validators="[validators.required]">
     </w-input>
 
-    <w-input
-      v-model="form.email"
-      class="mt3 form__input"
-      label="Почта"
-      :validators="[validators.required]"
-    >
+    <w-input v-model="form.email" class="mt3 form__input" label="Почта" :validators="[validators.required]">
     </w-input>
 
-    <w-input
-      v-model="form.password"
-      class="mt3 form__input"
-      label="Пароль"
-      type="password"
-      :validators="[validators.required]"
-    >
+    <w-input v-model="form.password" class="mt3 form__input" label="Пароль" type="password"
+      :validators="[validators.required]">
     </w-input>
-    <w-button
-      @click="sign()"
-      :disabled="valid === false"
-      class="text-center form__button"
-    >
+    <w-button @click="sign()" :disabled="valid === false" class="text-center form__button">
       Войти
     </w-button>
     <p class="form__link" @click="isRegistration = !isRegistration">
@@ -67,7 +48,7 @@ export default {
   methods: {
     async sign() {
       if (this.isRegistration) {
-        let result = await fetch("http://localhost:3000/user/registration", {
+        const result = await fetch("http://localhost:3000/user/registration", {
           method: "POST",
           body: JSON.stringify({
             email: this.form.email,
@@ -77,30 +58,45 @@ export default {
           headers: {
             "Content-Type": "application/json",
           },
-        }).then((res) => {
-          if (res.status === 201) {
-            store.commit("setInfo", {
-              login: this.form.name,
-              email: this.form.email,
-            });
-            this.$router.push("/game");
-          } else if (res.status === 409) {
-            this.showAlert = true;
-            this.alertText = "Ало дядя, такой email уже есть!";
-          } else {
-            this.showAlert = true;
-            this.alertText = "Что-то пошло не так:(";
-          }
+          // }).then((res) => {
+          //   if (res.status === 201) {
+          //     store.commit("setInfo", {
+          //       login: this.form.name,
+          //       email: this.form.email,
+          //     });
+          //     this.$router.push("/game");
+          //   } else if (res.status === 409) {
+          //     this.showAlert = true;
+          //     this.alertText = "Ало дядя, такой email уже есть!";
+          //   } else {
+          //     this.showAlert = true;
+          //     this.alertText = "Что-то пошло не так:(";
+          //   }
         });
+        const response = await result.json();
+        console.log(response);
+        if (result.status === 201) {
+          store.commit("setInfo", {
+            login: response.data.name,
+            accessToken: response.tokens.accessToken,
+            email: response.data.email,
+          });
+          this.$router.push("/game");
+        } else if (result.status === 409) {
+          this.showAlert = true;
+          this.alertText = "Ало дядя, такой email уже есть!";
+        } else {
+          this.showAlert = true;
+          this.alertText = "Что-то пошло не так:(";
+        }
         setTimeout(() => (this.showAlert = false), 5000);
         //   this.getInfo()
-        await result;
       } else {
         await this.signIn();
       }
     },
     async signIn() {
-      let result = await fetch("http://localhost:3000/user/login", {
+      const result = await fetch("http://localhost:3000/user/login", {
         method: "POST",
         body: JSON.stringify({
           email: this.form.email,
@@ -109,25 +105,26 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-      }).then((res) => {
-        if (res.status === 200) {
-          store.commit("setInfo", {
-            login: this.form.name,
-            email: this.form.email,
-          });
-          this.$router.push("/game");
-        } else if (res.status === 404) {
-          this.showAlert = true;
-          this.alertText = "Мы не смогли найти пользователя с такими данными";
-        } else {
-          this.showAlert = true;
-          this.alertText = "Что-то пошло не так:(";
-          //   this.isSign = true;
-          //   store.commit("notlogin");
-        }
       });
+      const response = await result.json();
+      console.log(response)
+      if (result.status === 200) {
+        store.commit("setInfo", {
+          accessToken: response.tokens.accessToken,
+          login: response.data.username,
+          email: response.data.email,
+        });
+        this.$router.push("/game");
+      } else if (result.status === 404) {
+        this.showAlert = true;
+        this.alertText = "Мы не смогли найти пользователя с такими данными";
+      } else {
+        this.showAlert = true;
+        this.alertText = "Что-то пошло не так:(";
+        //   this.isSign = true;
+        //   store.commit("notlogin");
+      }
       setTimeout(() => (this.showAlert = false), 5000);
-      await result;
     },
   },
 };
@@ -143,8 +140,12 @@ export default {
   justify-content: center;
   align-items: center;
   margin: auto;
-  align-self: center;
-  justify-self: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   flex-direction: column;
   width: 400px;
   border: 1px solid rgb(157, 255, 157);
@@ -164,6 +165,7 @@ export default {
     margin-top: 20px;
     color: rgb(47, 207, 47);
     cursor: pointer;
+
     &:hover {
       text-decoration: underline;
     }
