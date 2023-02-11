@@ -4,6 +4,8 @@ const authMiddleware = require("../middleware/auth_middleware");
 const User = require("../db/schemes/userScheme");
 const TokenService = require("../services/token-service");
 const router = express.Router();
+const nodemailer = require("nodemailer");
+const { v4: uuid_v4 } = require("uuid");
 
 router.post("/registration", async (req, res) => {
   const userData = await User.findOne({ email: req.body.email });
@@ -127,15 +129,52 @@ router.get("/refresh", async (req, res) => {
     });
   }
 });
-router.get("/details", authMiddleware, async (req, res) => {
-  if (req.user) {
+router.post("/details", async (req, res) => {
+  if (req.body) {
     try {
-      console.log(req.user);
-      const user = await User.findOne({ _id: req.user.id });
+      const user = await User.findOne({ _id: req.body.id });
       return res.status(200).json({
         message: "Successful Response",
-        data: { username: user.username, id: user._id, email: user.email },
+        data: { username: user.username, id: user.id },
       });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "User is not found",
+      });
+    }
+  }
+});
+
+router.post("/recover", async (req, res) => {
+  if (req.body) {
+    try {
+      const user = await User.findOne({ _id: req.body.id });
+      const { email } = req.body
+
+      if(email === user.email) {
+      const transporter = nodemailer.createTransport({
+        host: "smtp.mail.ru",
+        port: 465,
+        secure: true,
+        auth: {
+          user: "nodemailer02@mail.ru",
+          pass: "9GdRPEtpvKfbkrFYg5bx",
+        },
+      });
+  
+      let result = await transporter.sendMail({
+        from: '"Смена пароля" <nodemailer02@mail.ru>',
+        to: email.toString(),
+        subject: "Смена пароля",
+        text: `Для смены пароля перейдите по ссылке http://localhost:8080/password/${req.body.jwt}. Никому не сообщайте данную ссылку!`,
+      });
+      console.log(result);
+      return res.status(201).json("ok");
+    }
+    return res.status(500).json({
+      error: "User is not found",
+    }); 
     } catch (error) {
       console.log(error);
       return res.status(500).json({

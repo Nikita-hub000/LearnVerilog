@@ -8,13 +8,15 @@ module.exports = function (req, res, next) {
       });
     }
     const accessToken = authorizationHeader.split(" ")[1];
-    //console.log(accessToken);
+
     if (!accessToken) {
       res.status(401).json({
         message: "You are not authorized",
       });
     }
+    
     const userData = TokenService.validateAccessToken(accessToken);
+    console.log(accessToken, userData)
     if (!userData) {
       res.status(401).json({
         message: "You are not authorized",

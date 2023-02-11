@@ -1,22 +1,18 @@
 <template>
-  <div class="box">
-    <div id="nav" v-if="!isLoginPage">
-      <router-link class="link" to="/">Home</router-link> |
-      <router-link class="link" to="/">Home</router-link>
-      <!-- <router-link
-        class="link"
-        :class="{ disabled: $store.state.isEnter }"
-        to="/people"
-        ></router-link
-      > -->
-    </div>
-    <router-view />
-  </div>
+    <header-component />
+    <router-view class="content" />
+    <footer-component class="footer" />
 </template>
 
 <script>
+import '@/font/font.scss'
+import HeaderComponent from '@/components/Header.vue'
+import FooterComponent from '@/components/Footer.vue'
 export default {
   name: "App",
+  components: {
+    HeaderComponent, FooterComponent
+  },
   data() {
     return {
       isLoginPage: true,
@@ -32,29 +28,39 @@ export default {
 </script>
 
 <style>
-html {
-  height: 100%;
+* {
+  margin: 0;
+  padding: 0;
 }
-
-#app {
-  height: 100%;
-}
-
+html,
 body {
   height: 100%;
 }
+/* html {
+  min-height: 100vh;
+} */
 
-.link {
-  text-decoration: none;
-  color: teal;
-}
-.box {
+#app {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  height: 100%;
 }
-.disabled {
-  opacity: 0.5;
-  pointer-events: none;
+.content {
+  flex: 1 0 auto;
 }
+.footer {
+  flex: 0 0 auto;
+}
+
+
+/* body {
+  min-height: 100vh;
+  overflow: auto;
+} */
+/* body > footer {
+  position: sticky;
+  top: 100vh;
+} */
+
 </style>

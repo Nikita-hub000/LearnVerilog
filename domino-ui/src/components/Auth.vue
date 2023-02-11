@@ -1,22 +1,30 @@
 <template>
   <w-form v-model="valid" class="form">
-    <h1>DOMINO</h1>
-    <p>{{ isRegistration ? "Регистрация" : "Вход" }}</p>
-    <w-input class="mt3 form__input" v-model="form.name" v-show="isRegistration" label="Имя"
+    <p class="form__title">{{ isRegistration ? "Регистрация" : "Вход" }}</p>
+    <w-input v-model="formSignIn.email" v-show="!isRegistration" class="mb3 form__input" round outline label="Почта" :validators="[validators.required, validators.email]">
+    </w-input>
+
+    <w-input v-model="formSignIn.password" v-show="!isRegistration" class="mt3 form__input" round outline  label="Пароль" type="password"
+      >
+    </w-input>
+    <w-input class="mt3 form__input" v-model="form.name" round outline v-show="isRegistration" label="Псевдоним"
       :validators="[validators.required]">
     </w-input>
 
-    <w-input v-model="form.email" class="mt3 form__input" label="Почта" :validators="[validators.required]">
+    <w-input v-model="form.email" v-show="isRegistration" class="mb3 form__input" round outline label="Почта" :validators="[validators.required, validators.email]">
     </w-input>
 
-    <w-input v-model="form.password" class="mt3 form__input" label="Пароль" type="password"
-      :validators="[validators.required]">
+    <w-input v-model="form.password" v-show="isRegistration" class="mt3 form__input" round outline  label="Пароль" type="password"
+      :validators="[validators.required, validators.uniqe]">
+    </w-input>
+    <w-input v-model="form.passwordAgain" class="mt3 form__input" round outline label="Введите пароль еще раз" v-show="isRegistration" type="password"
+      :validators="[validators.required, validators.uniqe, validators.match(_, form.password)]">
     </w-input>
     <w-button @click="sign()" :disabled="valid === false" class="text-center form__button">
-      Войти
+      {{ isRegistration ? 'Зарегистрироваться' : 'Войти' }}
     </w-button>
     <p class="form__link" @click="isRegistration = !isRegistration">
-      {{ isRegistration ? "Вы уже смешарик?" : "Ты еще не смешарик..." }}
+      {{ isRegistration ? "Уже есть аккаунт?" : "Еще нет аккаунта?" }}
     </p>
     <w-transition-expand y>
       <w-alert v-if="showAlert" error>
@@ -28,18 +36,30 @@
 
 <script>
 import store from "@/store";
-// import bcrypt from 'bcrypt';
 export default {
   name: "AuthVue",
+  emits: ['modalchange'],
+  props: {
+    isReg: Boolean
+  },
   data: () => ({
     valid: null,
     validators: {
-      required: (value) => !!value || "This field is required",
+      required: (value) => !!value || "Это обязательное поле!",
+      minLength: (value) => value.length >= 3 || "Минимальная длина должна быть 3",
+      email: (value) => value.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/) || 'Формат почты неверен',
+      uniqe: (value) => value.match(/(?=.*[0-9])(?=.*[!@#$%^&*])/g) || 'Пароль должен содержать хотя бы 1 уникальный символ и 1 цифру',
+      match: (value, form) => value === form || 'Пароли не совпадают'
     },
     form: {
       name: "",
       password: "",
+      passwordAgain: "",
       email: "",
+    },
+    formSignIn: {
+      email: '',
+      password: ''
     },
     isRegistration: false,
     showAlert: false,
@@ -58,39 +78,44 @@ export default {
           headers: {
             "Content-Type": "application/json",
           },
-          // }).then((res) => {
-          //   if (res.status === 201) {
-          //     store.commit("setInfo", {
-          //       login: this.form.name,
-          //       email: this.form.email,
-          //     });
-          //     this.$router.push("/game");
-          //   } else if (res.status === 409) {
-          //     this.showAlert = true;
-          //     this.alertText = "Ало дядя, такой email уже есть!";
-          //   } else {
-          //     this.showAlert = true;
-          //     this.alertText = "Что-то пошло не так:(";
-          //   }
+          }).then((res) => {
+            if (res.status === 201) {
+              store.commit("setInfo", {
+                login: this.form.name,
+                email: this.form.email,
+              });
+            } else if (res.status === 409) {
+              this.showAlert = true;
+              this.alertText = "Пользователь с такой почтой уже существует";
+            } else {
+              this.showAlert = true;
+              this.alertText = "Что-то пошло не так:(";
+            }
         });
-        const response = await result.json();
-        console.log(response);
         if (result.status === 201) {
+          const response = await result.json();
+          localStorage.setItem('userInfo', JSON.stringify({
+            name: response.data.username,
+            accessToken: response.tokens.accessToken,
+            email: response.data.email,
+            id: response.data.id,
+          }))
           store.commit("setInfo", {
-            login: response.data.name,
+            id: response.data.id,
+            login: response.data.username,
             accessToken: response.tokens.accessToken,
             email: response.data.email,
           });
-          this.$router.push("/game");
+          this.$emit('userName', true)
+          this.$emit('modalchange');
         } else if (result.status === 409) {
           this.showAlert = true;
-          this.alertText = "Ало дядя, такой email уже есть!";
+          this.alertText = "Пользователь с такой почтой уже существует";
         } else {
           this.showAlert = true;
           this.alertText = "Что-то пошло не так:(";
         }
         setTimeout(() => (this.showAlert = false), 5000);
-        //   this.getInfo()
       } else {
         await this.signIn();
       }
@@ -99,30 +124,34 @@ export default {
       const result = await fetch("http://localhost:3000/user/login", {
         method: "POST",
         body: JSON.stringify({
-          email: this.form.email,
-          password: this.form.password,
+          email: this.formSignIn.email,
+          password: this.formSignIn.password,
         }),
         headers: {
           "Content-Type": "application/json",
         },
       });
       const response = await result.json();
-      console.log(response)
       if (result.status === 200) {
+        localStorage.setItem('userInfo', JSON.stringify({
+            id: response.data.id,
+            name: response.data.username,
+            accessToken: response.tokens.accessToken,
+            email: response.data.email,
+        }))
         store.commit("setInfo", {
+          id: response.data.id,
           accessToken: response.tokens.accessToken,
           login: response.data.username,
           email: response.data.email,
         });
-        this.$router.push("/game");
+        this.$emit('modalchange');
       } else if (result.status === 404) {
         this.showAlert = true;
         this.alertText = "Мы не смогли найти пользователя с такими данными";
       } else {
         this.showAlert = true;
-        this.alertText = "Что-то пошло не так:(";
-        //   this.isSign = true;
-        //   store.commit("notlogin");
+        this.alertText = "Что-то пошло не так";
       }
       setTimeout(() => (this.showAlert = false), 5000);
     },
@@ -131,12 +160,20 @@ export default {
 
 // "username": "Nikita",
 // "password": "12345",
-// "email": "test@gmail.com"
+// "email": "test@mail.ru"
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.error {
+  color: red
+}
+.w-input {
+  width: 200px !important;
+}
 .form {
   display: flex;
+  font-family: 'Inter', sans-serif;
+  font-weight: 100;
   justify-content: center;
   align-items: center;
   margin: auto;
@@ -148,27 +185,50 @@ export default {
   transform: translate(-50%, -50%);
   flex-direction: column;
   width: 400px;
-  border: 1px solid rgb(157, 255, 157);
-  border-radius: 10px;
+  border: 1px solid #000000;
+  border-radius: 35px;
   padding: 20px;
+  background-color: white;
 
   &__input {
-    width: 200px;
+    margin-top: 7px !important;
+  }
+
+  &__title {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
   }
 
   &__button {
-    width: 100px;
+    font-family: 'Inter', sans-serif !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    font-size: 20px !important;
+    min-width: 130px !important;
+    height: 50px !important;
     margin-top: 20px;
+    padding: 10px 20px !important;
+    background: #0077FF !important;
+    border: 1px solid #0077FF !important;
+    border-radius: 64px !important;
+    color: white !important;
+
+    cursor: pointer;
   }
 
   &__link {
-    margin-top: 20px;
-    color: rgb(47, 207, 47);
+    margin-top: 10px;
+    color: #0077FF;
     cursor: pointer;
 
     &:hover {
       text-decoration: underline;
     }
   }
+  .w-input--focused.w-input--floating-label .w-input__input-wrap--box .w-input__label--inside, .w-input--filled.w-input--floating-label .w-input__input-wrap--box .w-input__label--inside, .w-input--has-placeholder.w-input--floating-label .w-input__input-wrap--box .w-input__label--inside {
+    transform: translateY(-210%) scale(.85) !important;
+}
 }
 </style>

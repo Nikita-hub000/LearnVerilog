@@ -7,8 +7,6 @@ import 'wave-ui/dist/wave-ui.css'
 
 const app = createApp(App)
 
-new WaveUI(app, {
-  // Some Wave UI options.
-})
+new WaveUI(app)
 
 app.use(store).use(router).mount('#app')
