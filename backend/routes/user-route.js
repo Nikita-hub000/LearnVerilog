@@ -183,8 +183,7 @@ router.post("/recover", async (req, res) => {
     }
   }
 });
-router.get("/all", authMiddleware, async (req, res) => {
-  if (req.user) {
+router.get("/all", async (req, res) => {
     try {
       const users = await User.find();
       return res.status(200).json({
@@ -197,7 +196,6 @@ router.get("/all", authMiddleware, async (req, res) => {
         error: "User is not found",
       });
     }
-  }
 });
 
 module.exports = router;

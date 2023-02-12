@@ -3,6 +3,7 @@ import Main from '@/views/Main.vue';
 import Study from '@/views/Study.vue';
 import Profile from '@/views/Profile.vue';
 import Password from '@/views/password/_id.vue';
+import Chat from '@/views/chat/_id.vue';
 import store from '@/store'
 import auth from "@/middleware/auth";
 import setJwt from '@/middleware/setJwt'
@@ -40,6 +41,11 @@ const routes = [
     meta: {
       middleware: [password]
     }
+  },
+  {
+    path: "/chat/:id",
+    name: "ChatVue",
+    component: Chat,
   },
 ];
 

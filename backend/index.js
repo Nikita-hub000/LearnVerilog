@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const user = require("./routes/user-route");
 const friends = require("./routes/friend-route")
+const chat = require("./routes/chat-route")
 const corsMiddleware = require("./middleware/cors.middleware");
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
@@ -18,6 +19,7 @@ app.use(express.json());
 // simple route
 app.use("/user", user);
 app.use("/friend", friends);
+app.use("/chat", chat)
 app.get("/", (req, res) => {
   res.send("Hello, user!");
 });
