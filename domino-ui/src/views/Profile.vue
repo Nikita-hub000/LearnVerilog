@@ -27,29 +27,27 @@
                 <p class="profile__text-card">Дата регистрации: 10.10.2022</p>
                 <p class="profile__text-card">Дата последнего решенного задания: 14.10.2022</p>
                 <button class="profile__button" v-if="requestStatus" disabled>Запрос отправлен</button>
+                <button class="profile__button" v-else-if="friends.includes(find.userId)" disabled>Вы уже друзья!</button>
                 <button class="profile__button" v-else @click="addFriend">Добавить в друзья</button>
         </div>
         </div>
+        <div v-if="hasResponse" class="profile__friends profile__underline">
+        <div class="profile__card profile__card-responses" v-for="item in responses" :key="item">
+                <p class="profile__text-card">Вас хотят добавить в друзья</p>
+                <p class="profile__text-card">Псевдоним: anur</p>
+                <p class="profile__text-card">Дата регистрации: 10.10.2022</p>
+                <button class="profile__button" v-show="!addedFriend && !declinedFriend" @click="addNewFriend(item)">Добавить</button>
+                <button class="profile__button" disabled v-if="addedFriend">Добавлен</button>
+                <button class="profile__button profile__button-red" v-show="!addedFriend && !declinedFriend" @click="declineFriend(item)">Отклонить</button>
+                <button class="profile__button profile__button-red" v-if="declinedFriend" disabled>Отклонено</button>
+        </div>
+        </div>
         <div class="profile__friends">
-            <div class="profile__card">
-                <p class="profile__text-card">Псевдоним: Nikita</p>
-                <p class="profile__text-card">Дата регистрации: 10.10.2022</p>
+            <div class="profile__card" v-for="item in friends" :key="item">
+                <p class="profile__text-card">Псевдоним: Ando</p>
+                <p class="profile__text-card">Дата регистрации: 20.10.2022</p>
                 <p class="profile__text-card">Дата последнего решенного задания: 14.10.2022</p>
-                <p class="profile__text-card">Вы начали дружить с Nikita 12.10.2022!</p>
-                <button class="profile__button">Начать чат</button>
-            </div>
-            <div class="profile__card">
-                <p class="profile__text-card">Псевдоним: Nikita</p>
-                <p class="profile__text-card">Дата регистрации: 10.10.2022</p>
-                <p class="profile__text-card">Дата последнего решенного задания: 14.10.2022</p>
-                <p class="profile__text-card">Вы начали дружить с Nikita 12.10.2022!</p>
-                <button class="profile__button">Начать чат</button>
-            </div>
-            <div class="profile__card">
-                <p class="profile__text-card">Псевдоним: Nikita</p>
-                <p class="profile__text-card">Дата регистрации: 10.10.2022</p>
-                <p class="profile__text-card">Дата последнего решенного задания: 14.10.2022</p>
-                <p class="profile__text-card">Вы начали дружить с Nikita 12.10.2022!</p>
+                <p class="profile__text-card">Вы начали дружить с Nikita 25.10.2022!</p>
                 <button class="profile__button">Начать чат</button>
             </div>
         </div>
@@ -82,12 +80,27 @@ export default {
             userName: '',
             userId: ''
         },
-        requestStatus: false
+        requestStatus: false,
+        hasResponse: false,
+        addedFriend: false,
+        declinedFriend: false
     }),
     methods: {
      openModalExample() {
       $vfm.hideAll()
       $vfm.show('password')
+    },
+    async getUserId(id) {
+        const result = await fetch("http://localhost:3000/user/details", {
+        method: "POST",
+        body: JSON.stringify({
+          id
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then(res => res.json()).then(res => res.data.username)
+      return result
     },
     async check() {
        const result = await fetch("http://localhost:3000/friend/check", {
@@ -150,6 +163,50 @@ export default {
       }
       await this.check()
       setTimeout(() => (this.showAlert = false), 5000);
+    },
+    async addNewFriend(friendId) {
+        const result = await fetch("http://localhost:3000/friend/addNew", {
+        method: "POST",
+        body: JSON.stringify({
+          id: this.id,
+          friendId
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const response = await result.json();
+      console.log(response)
+      if (result.status === 200) {
+        this.addedFriend = true
+      }
+      if (result.status !== 200) {
+        this.showAlert = true;
+        this.alertText = "Мы не смогли найти пользователя с такими данными";
+      }
+      setTimeout(() => (this.showAlert = false), 5000);
+    }, 
+    async declineFriend(friendId) {
+        const result = await fetch("http://localhost:3000/friend/decline", {
+        method: "POST",
+        body: JSON.stringify({
+          id: this.id,
+          friendId
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const response = await result.json();
+      console.log(response)
+      if (result.status === 200) {
+        this.addedFriend = true
+      }
+      if (result.status !== 200) {
+        this.showAlert = true;
+        this.alertText = "Мы не смогли найти пользователя с такими данными";
+      }
+      setTimeout(() => (this.showAlert = false), 5000);
     }
     },
     async mounted() {
@@ -163,7 +220,6 @@ export default {
         },
       });
       const response = await result.json();
-      console.log(response)
       if (result.status === 200) {
         this.friends = []
         this.requests = []
@@ -171,6 +227,9 @@ export default {
         this.friends = response.friends.userData.friends
         this.requests = response.friends.userData.requests
         this.responses = response.friends.userData.responses
+        if(this.responses.length > 0) {
+            this.hasResponse = true
+        }
       } else {
         this.showAlert = true;
         this.alertText = "Что-то пошло не так";
@@ -247,6 +306,9 @@ export default {
             &-find {
                 height: 165px;
             }
+            &-responses {
+                height: 200px;
+            }
         }
         &__button {
             background: #008800;
@@ -262,6 +324,16 @@ export default {
             &-find {
                 margin-left: 13px !important;
                 margin-top: 18px !important;
+            }
+            &-red {
+                background: rgb(180, 10, 10);
+                border: 1px solid rgb(180, 10, 10);
+                margin-top: 13px;
+                &:hover {
+                    background: rgb(241, 0, 0);
+                    border: 1px solid rgb(241, 0, 0);
+                    cursor: pointer;
+                }
             }
         }
         &__find {
