@@ -35,7 +35,7 @@ router.post("/registration", async (req, res) => {
     return res.status(201).json({
       message: "Account successfully created",
       tokens: tokens,
-      data: { username: user.username, email: user.email, id: user._id },
+      data: { username: user.username, email: user.email, id: user._id, grant: user.isAdmin },
     });
   } catch (error) {
     console.log(err);
@@ -68,7 +68,7 @@ router.post("/login", async (req, res) => {
     return res.status(200).json({
       message: "Auth completed",
       tokens: tokens,
-      data: { username: user.username, email: user.email, id: user._id },
+      data: { username: user.username, email: user.email, id: user._id, grant: user.isAdmin },
     });
   } catch (error) {
     console.log(err);

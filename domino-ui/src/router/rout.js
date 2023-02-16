@@ -4,6 +4,8 @@ import Study from '@/views/Study.vue';
 import Profile from '@/views/Profile.vue';
 import Password from '@/views/password/_id.vue';
 import Chat from '@/views/chat/_id.vue';
+import Stat from '@/views/Statistic.vue';
+import Create from '@/views/Create.vue';
 import store from '@/store'
 import auth from "@/middleware/auth";
 import setJwt from '@/middleware/setJwt'
@@ -11,9 +13,17 @@ import middlewarePipeline from '../middleware/pipeline'
 import password from "@/middleware/password";
 const routes = [
   {
-    path: "/study",
+    path: "/study/:id",
     name: "StudyPage",
     component: Study,
+    meta: {
+      middleware: [setJwt, auth]
+    }
+  },
+  {
+    path: "/create",
+    name: "CreatePage",
+    component: Create,
     meta: {
       middleware: [setJwt, auth]
     }
@@ -46,6 +56,11 @@ const routes = [
     path: "/chat/:id",
     name: "ChatVue",
     component: Chat,
+  },
+  {
+    path: "/stat",
+    name: "StatVue",
+    component: Stat,
   },
 ];
 

@@ -2,8 +2,8 @@
 <w-toolbar class="nav-container">
 <div class="nav-box">
   <router-link class="link-title" to="/">LearnVerilog</router-link>
-  <router-link active-class="link-active" class="link" to="/study">Учиться</router-link>
-  <router-link active-class="link-active" class="link" to="/my">Статистика</router-link>
+  <router-link active-class="link-active" class="link" to="/study/1">Учиться</router-link>
+  <router-link active-class="link-active" class="link" to="/stat">Статистика</router-link>
   <router-link active-class="link-active" class="link" to="/">О нас</router-link>
 </div>
 <div v-if="!isAccount" class="nav-box">

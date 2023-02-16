@@ -99,12 +99,14 @@ export default {
             accessToken: response.tokens.accessToken,
             email: response.data.email,
             id: response.data.id,
+            grant: response.data.grant
           }))
           store.commit("setInfo", {
             id: response.data.id,
             login: response.data.username,
             accessToken: response.tokens.accessToken,
             email: response.data.email,
+            grant: response.data.grant
           });
           this.$emit('userName', true)
           this.$emit('modalchange');
@@ -138,12 +140,14 @@ export default {
             name: response.data.username,
             accessToken: response.tokens.accessToken,
             email: response.data.email,
+            grant: response.data.grant
         }))
         store.commit("setInfo", {
           id: response.data.id,
           accessToken: response.tokens.accessToken,
           login: response.data.username,
           email: response.data.email,
+          grant: response.data.grant
         });
         this.$emit('modalchange');
       } else if (result.status === 404) {

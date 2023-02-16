@@ -4,6 +4,7 @@
     <footer-component class="footer" />
 </template>
 
+
 <script>
 import '@/font/font.scss'
 import HeaderComponent from '@/components/Header.vue'
