@@ -1,0 +1,32 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 30
+      arrivalRate: 0
+      rampTo: 100
+      name: test1
+  defaults:
+    headers:
+      content-type: "application/json"
+    payload:
+      greeting: "Hello, world!"
+scenarios:
+  - name: "test login route"
+    flow:
+      - post:
+          url: "/user/login"
+          json:
+            password: "12345"
+            email: "nodemailer02@mail.ru"
+    expect:
+      - statusCode: 200
+      - contentType: "application/json"
+  - name: "test getUserInfo"
+    flow:
+      - get:
+          url: "/user/details"
+          json:
+            id: "62f6a66edd602fd2abba739f"
+    expect:
+      - statusCode: 200
+      - contentType: "application/json"

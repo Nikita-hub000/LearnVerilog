@@ -75,7 +75,7 @@ export default {
 }
 .link {
   font-family: 'Inter', sans-serif;
-  font-weight: 100;
+  font-weight: 400;
   line-height: 4px;
   text-decoration: none;
   color: #000000;

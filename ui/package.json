@@ -5,13 +5,15 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "jest"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
     "chart.js": "^4.2.1",
     "core-js": "^3.8.3",
     "simple-code-editor": "^1.2.2",
+    "testem": "^3.10.1",
     "vue": "^3.2.37",
     "vue-advanced-chat": "^2.0.7",
     "vue-chartjs": "^5.2.0",
@@ -26,8 +28,11 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "@vue/test-utils": "^2.3.2",
+    "@vue/vue3-jest": "^29.2.3",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
+    "jest": "^29.5.0",
     "sass": "^1.54.3",
     "sass-loader": "^13.0.2"
   },

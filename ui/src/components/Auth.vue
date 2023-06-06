@@ -20,7 +20,7 @@
     <w-input v-model="form.passwordAgain" class="mt3 form__input" round outline label="Введите пароль еще раз" v-show="isRegistration" type="password"
       :validators="[validators.required, validators.uniqe, validators.match(_, form.password)]">
     </w-input>
-    <w-button @click="sign()" :disabled="valid === false" class="text-center form__button">
+    <w-button @click="sign()" :disabled="valid === false" class="text-center form__button link btn">
       {{ isRegistration ? 'Зарегистрироваться' : 'Войти' }}
     </w-button>
     <p class="form__link" @click="isRegistration = !isRegistration">
@@ -168,6 +168,40 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  line-height: 4px;
+  text-decoration: none;
+  color: #000000;
+  margin-right: 17px;
+  font-size: 18px;
+  line-height: 20px;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
+
+  &-active {
+    color: #9D9D9D;
+  }
+  &-title {
+    font-weight: 700;
+    font-family: 'InterBold', serif;
+    color: #000000;
+    font-size: 18px;
+    line-height: 20px;
+    margin-right: 17px;
+  }
+}
+
+.btn {
+  background: #FFFFFF;
+  border: 1px solid #000000;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 5px 20px 5px;
+}
 .error {
   color: red
 }
